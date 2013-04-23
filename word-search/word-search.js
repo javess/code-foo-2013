@@ -55,6 +55,7 @@ var colors=["red","green","blue", "black"];
 
 var hash = new Array();
 
+//Create a letter hash for easy access to initial letters of words
 function createHash(){
     
     for(var i = 0; i < matrix.length; i++){
@@ -68,9 +69,10 @@ function createHash(){
     }
 }
 
+
+//Search for a word. Returns if a word was found and in which positions
 function findWord(word,index,x,y, direction, positions){
 
-//TODO: Anadir direcciones extra
 
     var char = word[index];
     if(index == word.length){
@@ -102,73 +104,21 @@ function findWord(word,index,x,y, direction, positions){
 	return {found:false, positions:positions};
     }else{
 	positions.push([x,y]);
- 	if ( (x+direction[0]) >= 0 && (x+direction[0])< matrix.length && 
-	     (y+direction[1]) >= 0 && (y + direction[1]) < matrix[x+direction[0]].length &&
-		char == matrix[x+direction[0]][y+direction[1]])
+	//Check if next word in in the matrix and if character matches necesary values
+ 	if ( (x+direction[0]) >= 0 && 
+	     (x+direction[0])< matrix.length && 
+	     (y+direction[1]) >= 0 && 
+	     (y + direction[1]) < matrix[x+direction[0]].length &&
+	     char == matrix[x+direction[0]][y+direction[1]]){
 	    return findWord(word, index+1, x+direction[0], y+direction[1], direction, positions);
-/*
-	switch(direction){
-	case 'right':
-	    if(x < matrix.length && (y+1) < matrix[x].length && char == matrix[x][y+1]   ){
-		return findWord(word, index+1, x, y+1, direction, positions);
-	    }
-	    break;
-	case 'down':
-	    if((x+1) < matrix.length && char == matrix[x+1][y]){
-		return findWord(word, index+1, x+1, y, direction, positions)
-	    }
-	    break;
-	case 'diagup':
-	    if((x-1) >= 0 && (y+1) < matrix[x-1].length && char == matrix[x-1][y+1]){
-		return findWord(word, index+1, x-1, y+1, direction, positions)
-	    }
-	    break;
-	case 'diagdown':
-	    if((x+1) < matrix.length && (y+1) < matrix[x].length && char == matrix[x+1][y+1]){
-		return findWord(word, index+1, x+1, y+1, direction, positions)
-	    }
-	    break;
-
-
-	    
-	default:
-
-	    var result;
-	    if(x < matrix.length && (y+1) < matrix[x].length && char == matrix[x][y+1]   ){
-		result = findWord(word, index+1, x, y+1, 'right', positions)
-	    }
-	    if(result != undefined && result.found == true)
-		return result;
-
-	    if((x+1) < matrix.length && char == matrix[x+1][y]){
-		result = findWord(word, index+1, x+1, y, 'down', positions)
-	    }
-	    if(result != undefined && result.found == true)
-		return result;
-
-	    if((x-1) >= 0 && (y+1) < matrix[x-1].length && char == matrix[x-1][y+1]){
-		result = findWord(word, index+1, x-1, y+1, 'diagup', positions)
-	    }
-	    if(result != undefined && result.found == true)
-		return result;
-
-	    if((x+1) < matrix.length && (y+1) < matrix[x].length && char == matrix[x+1][y+1]){
-		result = findWord(word, index+1, x+1, y+1, 'diagdown', positions)
-	    }
-	    if(result != undefined && result.found == true)
-		return result;
-	    break;
-
-	    
 	}
-*/
 	return {found:false, positions:positions};
-	
-	//assume we can only move right, down diagonals (up and down)
     }
     
 }
 
+
+//Display method
 function printMatrix(){
     for(var i = 0; i<matrix.length;i++){
 	for(var j = 0; j<matrix[i].length;j++){
@@ -178,6 +128,7 @@ function printMatrix(){
     }
 }
 
+//Word highlighting
 function highlightWord(positions, color){
     for(var i = 0; i<positions.length; i++){
 	var d = document.getElementById("l-"+positions[i][0]+"-"+positions[i][1]);
@@ -187,7 +138,6 @@ function highlightWord(positions, color){
 
 createHash();
 printMatrix();
-console.log(hash);
 
 
 for(var i =0; i<Words.length; i++){
