@@ -7,17 +7,57 @@
     z-index:10;
 }
 
-#world{
+#gameOver, #pause, #levelCleared{
+    display:none;
+    background-image:url('./assets/gameover.jpg');
     position:absolute;
-    top:0;
-    bottom:0;
-    left:0;
-    right:0;
-    background-color:black;
-    z-index:1;
+    top:125px;
+    left:250px;
+    width:300px;
+    height:300px;
+    z-index:100;
+    border:5px solid grey;
+}
+#levelCleared{
+    background-image:url('./assets/levelCleared.png');
+}
+#pause{
+    background-image:url('./assets/pause.jpg');
 }
 
-.playerBullets{
+body{
+    background-color:black;
+color:white;
+}
+
+#controlPanel{
+    position:relative;
+    float:left;
+    height:550px; 
+    width:300px;
+    border:10px white solid;
+}
+
+#world{
+    
+    position:relative;
+    float:left;
+    height:550px; 
+    width:800px;
+    top:0;
+    bottom:0;
+    
+    
+    left:0;
+    right:0;
+    
+    background-color:black;
+    z-index:1;
+    border:10px solid white;
+    
+}
+
+.playerBullets, .enemyBullets{
     background-color:yellow;
     height:15px;
     width:5px;
@@ -25,23 +65,69 @@
     z-index:10;
 }
 
+.enemyBullets{
+    background-color:red;
+}
+
 .row{
     position:absolute;
     top: 5px;
     height:50px;
+    
     left:0px;
     right:0px;
+	  
+    
     z-index:3;
 }
 
+
+.firstEnemy{
+    margin-left:15%;
+}
+.dead{
+    visibility:hidden;
+}
 .enemy{
     background-color:red;
-    width:10%;
-    margin-left:15%;
-    height:50px;
+    /*width:10%;*/
+    width:40px;
+    height:27px;
+    
+    margin-left:30px;;
+
     float:left;
     text-align:center;
     font-size:160%;
     line-height:50px;
+    background: url('./assets/spaceInvader.png');
 }
 
+.enemy.type0{background-position-x: 0px;}
+.enemy.type1{background-position-x: 80px;}
+.enemy.type2{background-position-x: 160px;}
+.enemy.step2{background-position-y: 27px;}
+
+.color0{background-color:red}
+.color1{background-color:yellow}
+.color2{background-color:green}
+.color3{background-color:blue}
+.color4{background-color:purple}
+.color5{background-color:orange}
+
+.checking{background-color:white;}
+
+#score{font-size:40px;}
+#controlPanel input { width:35px;} 
+#controlPanel label { width:175px; display:inline-block;} 
+#gameInstructions{
+    clear:both;
+    width:1120px;
+    border:10px solid white;
+    border-top:0px;
+}
+
+#nextLevelLink{
+    font-size:40px; 
+    color:white;
+}

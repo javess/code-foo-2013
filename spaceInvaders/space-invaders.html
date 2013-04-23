@@ -1,13 +1,58 @@
 <html>
 <head>
   <link rel="stylesheet" href="space-invaders.css"/>
-  <script type="text/javascript" src="./jquery.min.js"></script>
-  <script type="text/javascript" src="./underscore.js"></script>
+  <script type="text/javascript" src="./libs/jquery.min.js"></script>
+  <script type="text/javascript" src="./libs/underscore.js"></script>
   <script type="text/javascript" src="./space-invaders.js"></script>
 </head>
 <body>
   <div id="world">
     <div id="playerIcon"></div>
+    <div id="gameOver"></div>
+    <div id="pause"></div>
+    <div id="levelCleared">
+      <div style="margin-top:260px;height:40px; text-align:center; vertical-align:center;">
+	<a id="nextLevelLink" href="javascript:void">
+	  NEXT LEVEL
+	</a>
+      </div>
+
+    </div>
+  </div>
+  <div id="controlPanel">
+    <div style="padding:10px;">
+      <h1>
+	Score
+      </h1>
+      <span id="score">0</span>
+      
+      <h1> Settings </h1>
+      
+      <label>Ticks per movement:</label> <input id="ticksPerMovement"  value="20"></input> <br/>
+      <label>Ticks per second:</label> <input id="ticksPerSecond" value="30"></input> <br/><br/>
+      
+      <label>Enemy vertical Speed:</label> <input id="verticalSpeed"  value="20"></input> <br/>
+      <label>Enemy horizontal Speed:</label> <input id="horizontalSpeed" value="50"></input> <br/><br/>
+      
+      <label>Firing probability:</label> <input id="firingProbability" value="0.005"></input> <br/><br/>
+      <button id="reset"> RESET GAME </button>
+    </div>
+  </div>
+  <div id="gameInstructions">
+    <div style="padding:10px">
+      <h1> Instructions: </h1>
+      
+      The ship is controled with the mouse. <br/>
+      Click or press spacebar to shoot.<br/>
+      'P' pauses the game... useful for bathroom breaks or snack runs <br/>
+      <b>hint</b> Keeping spacebar pressed allows for continous shooting <br/>
+      You only have one life. Be careful! <br/>
+      There is no end to this game... collect as many points as possible <br/>
+      I have a short memory span... there are no high scores... take screenshots or something for bragging rights <br/>
+      If you are killed, reset the game with the super cool reset button on the right. <br/>
+      We built no covers... hidding is not the bushido way <br/>
+    </div>
+    
   </div>
 </body>
 </html>
