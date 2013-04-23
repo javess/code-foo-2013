@@ -1,8 +1,11 @@
 //Define family tree class
 
 function FamilyTree(){
+    
+    //Generations stored by level
     this.generation = new Array();
     
+    //Add member to family tree
     this.addMember = function(member){
 	if(!this.generation[member.generation]){
 	    this.generation[member.generation] = new Array();	    
@@ -11,7 +14,7 @@ function FamilyTree(){
 	this.generation[member.generation].push(member);
     }
 
-
+    //Does a somewhat smart search in the family tree
     this.findMember = function(name, g){
 	if(name==null && g ==null){
 	    console.log("No search specified. Returning whole tree.");
@@ -51,6 +54,7 @@ function FamilyTree(){
     
 }
 
+//Class for family member. Generation can be forced but is normally derived from that of the parents
 function FamilyMember(name, father,mother, generation){
     this.father = null;    
     var fatherGen = -1;
@@ -87,7 +91,6 @@ function FamilyMember(name, father,mother, generation){
 
 
 
-//This will be an incestuous family for the sake of simplicity in the data structure
 //In any case where a non-family member is added they would inherit their generation from that of the person he/she is marrying
 var tree = new FamilyTree();
 //Generation 1
