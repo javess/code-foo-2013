@@ -3,7 +3,32 @@
 
 
 <script type="text/javascript" src="./sort.js"></script>
+<script type="text/javascript">
 
+
+
+
+var items = 1;
+for(var j = 1; j < 7; j++){
+    var items = items * 10;
+    document.write('Creating random array of size: ' +items + '<br/>')
+    var initArray = new Date();
+    //Generate random array of size arrayLength
+    for(var i = 0; i< items ; i++){
+	a.push({score:Math.random()*100, name:'item ' + i});
+	
+    }
+    var endArray = new Date();
+    document.write('Array created in ' +(endArray - initArray)+'ms<br/>');
+    var init = new Date();
+    sort(a);
+    var end = new Date();
+    document.write('Array of size: ' +items + ' ordered in ' + (end-init) + 'ms<hr/>');
+
+}
+
+
+</script>
 </head>
 <body>
   <div id="results">

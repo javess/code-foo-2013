@@ -12,9 +12,9 @@ var levelCleared = false;
 var gameOver = false;
 var maxLeft = 0;
 var frame = 0;
-
+var maxBullets = 5;
 /* */
-var ticksPerMovement = 20;
+var ticksPerMovement = 40;
 var fps = 30;
 
 /* Player dimensions */
@@ -24,7 +24,7 @@ var playerWidth = 60;
 
 /* Enemy movements  */
 var verticalAdvance = 20;
-var horizontalAdvance = 50;
+var horizontalAdvance = 30;
 var enemiesPerRow = 10;
 
 /* Enemy dimensions */
@@ -34,7 +34,7 @@ var enemyHeight = 27;
 var enemyMargin = 30;
 
 /* Enemy stats */
-var firingProbability = 0.005;
+var firingProbability = 0.01;
 
 
 
@@ -76,7 +76,6 @@ function addRow(){
 function checkWinningConditions(){
     var aliveEnemies = $(".enemy.alive").length;
     if(aliveEnemies == 0){
-	alert("LEVEL CLEARED");
 	pausedGame = true;
 	levelCleared = true;
 	stopGame();
@@ -103,6 +102,8 @@ function detectColisions(){
 		    var id = b.attr('id');
 		    removeIds.push(id);
 		    $(b).remove();
+		    $("#boom").jPlayer("play");
+
 		    score += 100;
 		}
  	    });
@@ -225,9 +226,12 @@ function refreshWorld(){
 }
 
 function addPlayerBullet(){
-    var pos = Number(player.css('left').replace('px','')) + (player.width()/2);
-    playerBullets.push( { id:totalPlayerBullets, x:pos, y:25});
-    totalPlayerBullets++;
+    if(playerBullets.length < maxBullets){	
+	$("#fire").jPlayer("play");
+	var pos = Number(player.css('left').replace('px','')) + (player.width()/2);
+	playerBullets.push( { id:totalPlayerBullets, x:pos, y:25});
+	totalPlayerBullets++;
+    }
 }
 
 function addEnemyBullet(enemy){
@@ -247,7 +251,7 @@ function stopGame(){
     }
     clearInterval(loop);
     loop = null;
-    
+     $("#soundtrack").jPlayer("volume",0.1);
 }
 
 function unpauseGame(){
@@ -257,9 +261,60 @@ function unpauseGame(){
     loop= setInterval(function(){
 	refreshWorld();
     },1000/fps);
+     $("#soundtrack").jPlayer("volume",1);
 }
 
 $(document).ready(function(){
+
+
+    /******************************
+                Audio Setup
+     *****************************/
+    $("#soundtrack").jPlayer({
+	ready: function () {
+            $(this).jPlayer("setMedia", {
+                mp3: "./media/spaceinvaders1.mp3"
+            }).jPlayer("play"); // auto play
+        },
+        ended: function (event) {
+            $(this).jPlayer("play");
+        },
+	swfPath: "./libs/",
+	supplied: "mp3"
+    });
+
+    $("#fire").jPlayer({
+	ready: function () {
+            $(this).jPlayer("setMedia", {
+                mp3: "./media/shoot.mp3"
+            })
+        },
+	volume: 0.3,
+	swfPath: "./libs/",
+	supplied: "mp3"
+    });
+
+    $("#boom").jPlayer({
+	ready: function () {
+            $(this).jPlayer("setMedia", {
+                mp3: "./media/explosion.mp3"
+            })
+        },
+	volume:0.3,
+	swfPath: "./libs/",
+	supplied: "mp3"
+    });
+
+
+
+
+
+
+
+    /******************************
+                Game Setup
+     *****************************/
+
     player =  $("#playerIcon");
     playerBullets = new Array();
     //spawnRow();
@@ -346,19 +401,16 @@ $(document).ready(function(){
 	}
     });
 
+
+    // This is how we move to the next level
     $("#nextLevelLink").click(function(){
 	//0 increase firing rate
 	//1 increase horizontal speed
 	//2 increase vertical speed
 	//3 decrease ticks per movement
-	firingProbability += 0.0025;
+	firingProbability = firingProbability*2; 
 	$("#firingProbability").val(firingProbability);
 
-/*	horizontalAdvance += 5;
-	$("#horizontalSpeed").val(horizontalAdvance);
-	verticalAdvance+= 2;
-	$("#verticalSpeed").val(verticalAdvance);
-*/
 	ticksPerMovement -= 2;
 	$("#ticksPerMovement").val(ticksPerMovement);
 	$("#levelCleared").hide();
@@ -393,15 +445,15 @@ function initWorld(reset){
 	/* Game status */
 	maxLeft = 0;
 	/* */
-	ticksPerMovement = 20;
+	ticksPerMovement = 40;
 	fps = 30;
     
 	/* Enemy movements  */
 	verticalAdvance = 20;
-	horizontalAdvance = 50;
+	horizontalAdvance = 30;
 	
 	/* Enemy stats */
-	firingProbability = 0.005;
+	firingProbability = 0.01;
     }
 
     for(var i =0; i<5; i++){
@@ -412,3 +464,4 @@ function initWorld(reset){
     },1000/fps);
 
 }
+

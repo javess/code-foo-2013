@@ -1,4 +1,20 @@
+/***
 
+I chose quicksort for the sorting algoritm as it has fairly 
+small asociated constants, is done in-site which allows for lower memory consumption
+and allows cache usage. Quick sort is O(n log n) which is known to be the optimal order 
+for sorting arrays. 
+
+The tests set up in sort.html show how this algorithm is high scalable sorting 
+random arrays of up to 1.000.000 items in under a second on a 
+
+2GHz Intel Core i7 with 8gb of ram....
+
+Mind you this is being ran in a browser. 
+It would probably be faster if ran as a library for a node program
+
+
+***/
 
 
 function sort(a){
@@ -41,28 +57,6 @@ var a = [];
 
 
 
-
-
-
-
-var items = 1;
-for(var j = 1; j < 7; j++){
-    var items = items * 10;
-    document.write('Creating random array of size: ' +items + '<br/>')
-    var initArray = new Date();
-    //Generate random array of size arrayLength
-    for(var i = 0; i< items ; i++){
-	a.push({score:Math.random()*100, name:'item ' + i});
-	
-    }
-    var endArray = new Date();
-    document.write('Array created in ' +(endArray - initArray)+'ms<br/>');
-    var init = new Date();
-    sort(a);
-    var end = new Date();
-    document.write('Array of size: ' +items + ' ordered in ' + (end-init) + 'ms<hr/>');
-
-}
 
 
 
