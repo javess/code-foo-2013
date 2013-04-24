@@ -49,7 +49,7 @@ var UFOheight = 60;
 /* Probabilities */
 var firingProbability = 0.005;
 var UFOprobability = 0.001;
-var UFOspeed = 3;
+var UFOspeed = 4;
 var actualUFOSpeed = 0;
 
 /**/
