@@ -56,6 +56,10 @@ var actualUFOSpeed = 0;
 var currentMargin = 0;
 var world;
 
+
+
+//Adds a row of aliens to the initial game. 
+//Shifts every other row down
 function addRow(){
     var a ='<div class="row entryRow">';
     for(var i =0; i<enemiesPerRow; i++){
@@ -85,14 +89,7 @@ function addRow(){
     currentMargin = maxLeft/2;
 }
 
-function checkWinningConditions(){
-    var aliveEnemies = $(".enemy.alive").length;
-    if(aliveEnemies == 0){
-	pausedGame = true;
-	levelCleared = true;
-	stopGame();
-    }
-}
+
 
 function insertUFO(){
     var r = Math.random();
@@ -152,13 +149,29 @@ function UFOadvance(){
     }
 }
 
+
+//Verify if level has been cleared
+function checkWinningConditions(){
+    var aliveEnemies = $(".enemy.alive").length;
+    if(aliveEnemies == 0){
+	pausedGame = true;
+	levelCleared = true;
+	stopGame();
+    }
+}
+
+//Verify if level has been lost. This is triggered when alive aliens reach the player height.
 function checkLosingConditions(){
     
     
     $(".enemy.alive").each(function(){
+	//Player height
 	var pTop = $("#playerIcon").offset().top;
+	//Enemy height
 	var aTop = $(this).offset().top + enemyHeight;
 	
+	//If players reached, pause game, trigger game over and play 
+	//sound and animation for death
 	if(aTop > pTop){
 	    pausedGame = true;
 	    gameOver = true;
@@ -168,9 +181,13 @@ function checkLosingConditions(){
     });
 }
 
+//Check for collisions between playerBullets and alive enemies or 
+//enemy bullets and the player
 function detectColisions(){
-
+    
     var removeIds = new Array();
+    
+    //Go through player bullets
     $(".playerBullets").each(function(){
 	var b = $(this);
 	var bp = b.offset();
@@ -181,21 +198,24 @@ function detectColisions(){
 		var e = $(this);
 		var ep = e.offset();		
 		
-		
+		//check if bullet is in bounding box of the enemy
 		if( ep.left <= bp.left && (ep.left + enemyWidth) >= bp.left
 		   &&  ep.top >= bp.top && (ep.top - enemyHeight) <= bp.top ){
+
+
+		    //KILL THE ALIENS!!!! KILL KILL KILL!!
 		    $(this).removeClass("alive").addClass("dead").addClass("explode");
 		    var id = b.attr('id');
 		    removeIds.push(id);
 		    $(b).remove();
-
 		    $("#invaderkilled").jPlayer("play");
-
 		    score += 100;
 		}
  	    });
 	}
     });
+    
+    //Remove bullets that have collided
     var rObj = new Array();
     for(var i = 0; i <= removeIds.length; i++){
 	for(var j =0; j< playerBullets.length; j++){
@@ -214,6 +234,8 @@ function detectColisions(){
 	
 	if( ep.left <= bp.left && (ep.left + enemyWidth) >= bp.left
 	    &&  ep.top >= bp.top && (ep.top - enemyHeight) <= bp.top ){
+	    
+	    //Well,... the player is dead... start funeral rites
 	    pausedGame = true;
 	    gameOver = true;
 	    $("#boom").jPlayer("play");
@@ -226,6 +248,7 @@ function detectColisions(){
     
 }
 
+//Get enemy to randomly fire at you
 function enemyFire(){
     $(".enemy.alive").each(function(){
 	var r = Math.random();
@@ -236,6 +259,8 @@ function enemyFire(){
 }
 
 
+//Move enemies forward
+//This method is driven by the enemyLoop
 function moveEnemies(){
     $(".explode").removeClass("explode");
     $(".enemy").toggleClass("step2");
@@ -275,6 +300,9 @@ function moveEnemies(){
 
 }
 
+
+//Refresh the world status. This method moves bullets, 
+//tests for UFO appearances and checks for collisions
 function refreshWorld(){
     insertUFO();
     if(shooting){
@@ -326,7 +354,10 @@ function refreshWorld(){
 
 }
 
+
+//Add a player bullet to the world
 function addPlayerBullet(){
+    //Check if we haven't  already maxed the bullet cap
     if(playerBullets.length < maxBullets){
 	shooting = true;
 	$("#playerIcon").addClass("shoot");
@@ -337,6 +368,7 @@ function addPlayerBullet(){
     }
 }
 
+//Add enemy bullet to the world
 function addEnemyBullet(enemy){
     var left = enemy.offset().left  -  $("#world").offset().left ;
     var top  = enemy.parent().position().top + enemyHeight ;
@@ -344,6 +376,7 @@ function addEnemyBullet(enemy){
     totalEnemyBullets++;
 }
 
+//Pause, level cleared and game over stopping funciont
 function stopGame(){
     if(levelCleared){
 	$("#levelCleared").show();
@@ -361,6 +394,7 @@ function stopGame(){
     $("#soundtrack").jPlayer("volume",0.1);
 }
 
+//Resume game from pause
 function unpauseGame(){
     $("#gameOver").hide();
     $("#pause").hide();
@@ -373,6 +407,9 @@ function unpauseGame(){
     $("#soundtrack").jPlayer("volume",1);
 }
 
+
+
+//Game initialization
 $(document).ready(function(){
 
 
@@ -503,7 +540,9 @@ $(document).ready(function(){
 	}
 	
     });
+
     
+    //Initialize world to basic settings
     initWorld(true);
     
     $(".settings").focus(function(){
@@ -513,6 +552,7 @@ $(document).ready(function(){
 	}
     });
     
+    //Bind apply settings button
     $("#applySettings").click(function(){ 
 	
 	enemyMovesPerSecond = Number($("#enemyMovesPerSecond").val());
@@ -529,7 +569,7 @@ $(document).ready(function(){
     });
         
 
-
+    //Reset game world 
     $("#reset").click(function(){ 
 	if(confirm("Are you sure you want to reset? All progress will be lost")){
 	    initWorld(true);
@@ -552,6 +592,7 @@ $(document).ready(function(){
 
 
 
+//Initialize world. reset == true implies defaulting to the original settings
 function initWorld(reset){
     $("#UFO,.row,.enemyBullet,.playerBullet").remove();
     $("#playerIcon").removeClass("playerdead");
