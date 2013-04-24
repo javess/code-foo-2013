@@ -65,6 +65,27 @@ color:white;
     
 }
 
+#UFO{
+    width:60px;
+    height:60px;
+    position:relative;
+    background:url("./assets/UFO.png");
+    margin-left:-60px;
+}
+
+#UFO.deadufo{
+    background:url("./assets/ufokill.png");
+}
+#UFOpanel{
+    position:absolute; 
+    top:0;
+    left:0;
+    right:0;
+    height:60px;
+    overflow:hidden;
+    
+}
+
 .playerBullets, .enemyBullets{
     background-color:yellow;
     height:15px;

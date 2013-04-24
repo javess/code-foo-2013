@@ -5,6 +5,7 @@ var totalPlayerBullets = 0;
 var totalEnemyBullets = 0;
 var loop;
 var enemyLoop;
+var UFOLoop;
 var score = 0;
 
 /* Game status */
@@ -19,6 +20,7 @@ var bulletSpeed = 10;
 /* Animation ticks */
 var fps = 60;
 var enemyMovesPerSecond = 2;
+var UFOenemyMovesPerSecond = 90;
 
 var shootingFrames = 5;
 var currentShootingFrame = 0;
@@ -40,10 +42,15 @@ var enemyWidth = 40;
 var enemyHeight = 27;
 var enemyMargin = 30;
 
-/* Enemy stats */
+var UFOwidth = 60;
+var UFOheight = 60;
+
+
+/* Probabilities */
 var firingProbability = 0.005;
-
-
+var UFOprobability = 0.001;
+var UFOspeed = 3;
+var actualUFOSpeed = 0;
 
 /**/
 var currentMargin = 0;
@@ -84,6 +91,64 @@ function checkWinningConditions(){
 	pausedGame = true;
 	levelCleared = true;
 	stopGame();
+    }
+}
+
+function insertUFO(){
+    var r = Math.random();
+    if(r<UFOprobability && $("#UFO").length == 0){
+	$("#UFOpanel ").append("<div id='UFO' points='"
+			       +(1000+Math.floor(Math.random()*4000))
+			       +"'></div>");
+	
+	actualUFOSpeed = Math.random() >= 0.5? UFOspeed:-UFOspeed;
+	if(actualUFOSpeed > 0){
+	    $("#UFO").css("margin-left",-UFOwidth);
+	}else{
+	    $("#UFO").css("margin-left",world.width() + UFOwidth);
+	}
+	
+	UFOloop = setInterval(function(){UFOadvance();},1000/UFOenemyMovesPerSecond)
+	$("#ufosound").jPlayer("play");
+	
+	
+    }
+    
+}
+
+
+function UFOadvance(){
+    var left = Number($("#UFO").css("margin-left").replace('px',''));
+    left = left + actualUFOSpeed;
+    var UFO = $("#UFO");
+    UFO.css("margin-left",left);
+    var killUFOloop = false;
+    var o = UFO.offset();
+    $(".playerBullets").each(function(){
+	var ob = $(this).offset();
+	if((o.left <= ob.left && (o.left + UFOwidth) >= ob.left) &&
+	   (o.top <= ob.top && (o.top + UFOheight) >= ob.top)){
+	    score += Number(UFO.attr('points'));
+	    killUFOloop = true;
+	    //Remove player bullet
+	    UFO.addClass('deadufo');
+	    $("#boom").jPlayer("play");
+	    setTimeout(function(){$("#UFO").remove();},500);
+	}
+    });
+
+
+    if(
+	(actualUFOSpeed > 0 && left >= world.width() + UFOwidth) || 
+	    (actualUFOSpeed < 0 && left <= -UFOwidth)) 
+    {
+	killUFOloop = true;
+	UFO.remove();
+    }
+    if(killUFOloop){
+	$("#ufosound").jPlayer("stop");
+	clearInterval(UFOloop);
+	UFOloop = null;
     }
 }
 
@@ -211,6 +276,7 @@ function moveEnemies(){
 }
 
 function refreshWorld(){
+    insertUFO();
     if(shooting){
 	if(currentShootingFrame > shootingFrames){
 	    currentShootingFrame = 0;
@@ -290,6 +356,8 @@ function stopGame(){
     loop = null;
     clearInterval(enemyLoop);
     enemyLoop = null;
+    clearInterval(UFOloop);
+    UFOloop = null;
     $("#soundtrack").jPlayer("volume",0.1);
 }
 
@@ -299,7 +367,9 @@ function unpauseGame(){
     
     loop= setInterval(function(){refreshWorld();},1000/fps);
     enemyLoop = setInterval(function(){moveEnemies();},1000/enemyMovesPerSecond);
-    
+    if($("#UFO").length>0){
+	UFOloop = setInterval(function(){UFOadvance();},1000/UFOenemyMovesPerSecond);
+    }
     $("#soundtrack").jPlayer("volume",1);
 }
 
@@ -318,6 +388,20 @@ $(document).ready(function(){
         ended: function (event) {
             $(this).jPlayer("play");
         },
+	swfPath: "./libs/",
+	supplied: "mp3"
+    });
+
+    $("#ufosound").jPlayer({
+	ready: function () {
+            $(this).jPlayer("setMedia", {
+                mp3: "./media/ufo_lowpitch.mp3"
+            }) // auto play
+        },
+        ended: function (event) {
+            $(this).jPlayer("play");
+        },
+	volume:0.1,
 	swfPath: "./libs/",
 	supplied: "mp3"
     });
@@ -469,7 +553,7 @@ $(document).ready(function(){
 
 
 function initWorld(reset){
-    $(".row,.enemyBullet,.playerBullet").remove();
+    $("#UFO,.row,.enemyBullet,.playerBullet").remove();
     $("#playerIcon").removeClass("playerdead");
     $("#soundtrack").jPlayer("volume",1);
     $("#gameOver").hide();
@@ -498,7 +582,7 @@ function initWorld(reset){
 	/* Game status */
 	maxLeft = 0;
 	/* */
-	enemyMovesPerSecond = 3;
+	enemyMovesPerSecond = 1;
 	
 	fps = 60;
     
