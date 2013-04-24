@@ -1,30 +1,37 @@
 var player;
 var playerBullets = new Array();
 var enemyBullets = new Array();
+
 var totalPlayerBullets = 0;
 var totalEnemyBullets = 0;
+
 var loop;
 var enemyLoop;
 var UFOLoop;
+
 var score = 0;
+
+/*Global variables*/
+var maxLeft = 0;
+var frame = 0;
+var maxBullets = 1;
+var bulletSpeed = 10;
+var shootingFrames = 5;
+var currentShootingFrame = 0;
+var shooting = true;
+var currentMargin = 0;
+var world;
 
 /* Game status */
 var pausedGame = false;
 var levelCleared = false;
 var gameOver = false;
-var maxLeft = 0;
-var frame = 0;
-var maxBullets = 1;
-var bulletSpeed = 10;
 
 /* Animation ticks */
 var fps = 60;
 var enemyMovesPerSecond = 2;
 var UFOenemyMovesPerSecond = 90;
 
-var shootingFrames = 5;
-var currentShootingFrame = 0;
-var shooting = true;
 
 /* Player dimensions */
 var playerHeight = 37;
@@ -42,6 +49,7 @@ var enemyWidth = 40;
 var enemyHeight = 27;
 var enemyMargin = 30;
 
+/* UFO dimmensions */
 var UFOwidth = 60;
 var UFOheight = 60;
 
@@ -52,9 +60,7 @@ var UFOprobability = 0.001;
 var UFOspeed = 4;
 var actualUFOSpeed = 0;
 
-/**/
-var currentMargin = 0;
-var world;
+
 
 
 
@@ -89,8 +95,7 @@ function addRow(){
     currentMargin = maxLeft/2;
 }
 
-
-
+/***************   UFO MANAGEMENT *********************/
 function insertUFO(){
     var r = Math.random();
     if(r<UFOprobability && $("#UFO").length == 0){
@@ -149,6 +154,9 @@ function UFOadvance(){
     }
 }
 
+
+
+/************** Game status check *********************/
 
 //Verify if level has been cleared
 function checkWinningConditions(){
