@@ -113,7 +113,7 @@ function transform(a,b){
     if(path == null){
 	document.write("The cake is a lie! There is no answer!!! (we could say 42 is a suitable answer though!)");
     }else{
-    
+	
 	
 	for(var i = 0; i<path.length; i++){
 	    if(i==0){
