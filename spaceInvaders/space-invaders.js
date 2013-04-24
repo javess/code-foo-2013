@@ -4,6 +4,7 @@ var enemyBullets = new Array();
 var totalPlayerBullets = 0;
 var totalEnemyBullets = 0;
 var loop;
+var enemyLoop;
 var score = 0;
 
 /* Game status */
@@ -12,13 +13,19 @@ var levelCleared = false;
 var gameOver = false;
 var maxLeft = 0;
 var frame = 0;
-var maxBullets = 5;
-/* */
-var ticksPerMovement = 40;
-var fps = 30;
+var maxBullets = 1;
+var bulletSpeed = 10;
+
+/* Animation ticks */
+var fps = 60;
+var enemyMovesPerSecond = 2;
+
+var shootingFrames = 5;
+var currentShootingFrame = 0;
+var shooting = true;
 
 /* Player dimensions */
-var playerHeight = 20;
+var playerHeight = 37;
 var playerWidth = 60;
 
 
@@ -34,15 +41,13 @@ var enemyHeight = 27;
 var enemyMargin = 30;
 
 /* Enemy stats */
-var firingProbability = 0.01;
+var firingProbability = 0.005;
 
 
 
 /**/
 var currentMargin = 0;
 var world;
-
-
 
 function addRow(){
     var a ='<div class="row entryRow">';
@@ -82,6 +87,22 @@ function checkWinningConditions(){
     }
 }
 
+function checkLosingConditions(){
+    
+    
+    $(".enemy.alive").each(function(){
+	var pTop = $("#playerIcon").offset().top;
+	var aTop = $(this).offset().top + enemyHeight;
+	
+	if(aTop > pTop){
+	    pausedGame = true;
+	    gameOver = true;
+	    $("#boom").jPlayer("play");
+	    $("#playerIcon").addClass("playerdead");
+	    stopGame();	}
+    });
+}
+
 function detectColisions(){
 
     var removeIds = new Array();
@@ -98,11 +119,12 @@ function detectColisions(){
 		
 		if( ep.left <= bp.left && (ep.left + enemyWidth) >= bp.left
 		   &&  ep.top >= bp.top && (ep.top - enemyHeight) <= bp.top ){
-		    $(this).removeClass("alive").addClass("dead");
+		    $(this).removeClass("alive").addClass("dead").addClass("explode");
 		    var id = b.attr('id');
 		    removeIds.push(id);
 		    $(b).remove();
-		    $("#boom").jPlayer("play");
+
+		    $("#invaderkilled").jPlayer("play");
 
 		    score += 100;
 		}
@@ -129,9 +151,9 @@ function detectColisions(){
 	    &&  ep.top >= bp.top && (ep.top - enemyHeight) <= bp.top ){
 	    pausedGame = true;
 	    gameOver = true;
+	    $("#boom").jPlayer("play");
+	    $("#playerIcon").addClass("playerdead");
 	    stopGame();
-	    alert(' YOU ARE DEAD! ');
-
 	}
     
     });
@@ -149,84 +171,99 @@ function enemyFire(){
 }
 
 
+function moveEnemies(){
+    $(".explode").removeClass("explode");
+    $(".enemy").toggleClass("step2");
+    $(".firstEnemy").each(function(item){
+	var left = Number($(this).css('margin-left').replace('px',''));
+	if($(this).hasClass('right')){
+	    left+= horizontalAdvance
+	    
+	    if(left>=maxLeft){
+		$(this).removeClass('right').addClass('left');
+		$(this).parents(".row").each(function(item){
+		    var t = Number($(this).css('top').replace('px',''));
+		    $(this).css('top',t+verticalAdvance);
+		});
+	    }else{
+		$(this).css('margin-left',left);
+	    }
+	}
+	
+	if($(this).hasClass('left')){
+	    left-= horizontalAdvance;
+	    if(left<=0){
+		$(this).removeClass('left').addClass('right');
+		$(this).parents(".row").each(function(item){
+		    var t = Number($(this).css('top').replace('px',''));
+		    $(this).css('top',t+verticalAdvance);
+		});
+		
+	    }else{
+		$(this).css('margin-left',left);
+	    }
+	}
+	currentMargin = left;
+    });
+    enemyFire();
+    checkLosingConditions();
+
+}
+
 function refreshWorld(){
+    if(shooting){
+	if(currentShootingFrame > shootingFrames){
+	    currentShootingFrame = 0;
+	    shooting = 0;
+	    $("#playerIcon").removeClass("shoot");
+	}else{
+	    currentShootingFrame++;
+	}
+    }
+    
     frame++;
     checkWinningConditions();
     $(".playerBullets, .enemyBullets").remove();
-    var top = $(".entryRow").css('top').replace('px','');
-    
-    if(frame%ticksPerMovement == 0){
 
-	$(".enemy").toggleClass("step2");
-	$(".firstEnemy").each(function(item){
-	    var left = Number($(this).css('margin-left').replace('px',''));
-	    if($(this).hasClass('right')){
-		left+= horizontalAdvance
-		
-		if(left>=maxLeft){
-		    $(this).removeClass('right').addClass('left');
-		    $(this).parents(".row").each(function(item){
-			var t = Number($(this).css('top').replace('px',''));
-			$(this).css('top',t+verticalAdvance);
-		    });
-		}else{
-		    $(this).css('margin-left',left);
-		}
-	    }
-	    
-	    if($(this).hasClass('left')){
-		left-= horizontalAdvance;
-		if(left<=0){
-		    $(this).removeClass('left').addClass('right');
-		    $(this).parents(".row").each(function(item){
-			var t = Number($(this).css('top').replace('px',''));
-			$(this).css('top',t+verticalAdvance);
-		    });
-		    
-		}else{
-		    $(this).css('margin-left',left);
-		}
-	    }
-	    currentMargin = left;
-	    
-	});
-	
-	   enemyFire()
-    }
 
-    
+    //Remove bullets out of bounds
     var remove = new Array();
     _.each(playerBullets, function(e){
 	var bullet = $("<div class='playerBullets'></div>").css('left',e.x-2)
 	    .css("bottom",e.y).attr('id', 'pb-'+e.id);
 	$("#world").append(bullet);
-	e.y = e.y +10;
+	e.y = e.y +bulletSpeed;
 	if(e.y > $("#world").height()){
 	    remove.push(e);
 	}
     });
     playerBullets = _.difference(playerBullets,remove);
 
+    //Remove enemy bullets out of bounds
     remove = new Array();
     _.each(enemyBullets, function(e){
 	var bullet = $("<div class='enemyBullets'></div>").css('left',e.x-2)
 	    .css("top",e.y).attr('id', 'eb-'+e.id);
 	$("#world").append(bullet);
-	e.y = e.y +10;
+	e.y = e.y +bulletSpeed;
 	if(e.y > $("#world").height()){
 	    remove.push(e);
 	}
     });
     enemyBullets = _.difference(enemyBullets,remove);
  
+    //Find any collisions
     detectColisions();
-
+    
+    //update score display
     $("#score").html(score);
 
 }
 
 function addPlayerBullet(){
-    if(playerBullets.length < maxBullets){	
+    if(playerBullets.length < maxBullets){
+	shooting = true;
+	$("#playerIcon").addClass("shoot");
 	$("#fire").jPlayer("play");
 	var pos = Number(player.css('left').replace('px','')) + (player.width()/2);
 	playerBullets.push( { id:totalPlayerBullets, x:pos, y:25});
@@ -251,17 +288,19 @@ function stopGame(){
     }
     clearInterval(loop);
     loop = null;
-     $("#soundtrack").jPlayer("volume",0.1);
+    clearInterval(enemyLoop);
+    enemyLoop = null;
+    $("#soundtrack").jPlayer("volume",0.1);
 }
 
 function unpauseGame(){
     $("#gameOver").hide();
     $("#pause").hide();
-
-    loop= setInterval(function(){
-	refreshWorld();
-    },1000/fps);
-     $("#soundtrack").jPlayer("volume",1);
+    
+    loop= setInterval(function(){refreshWorld();},1000/fps);
+    enemyLoop = setInterval(function(){moveEnemies();},1000/enemyMovesPerSecond);
+    
+    $("#soundtrack").jPlayer("volume",1);
 }
 
 $(document).ready(function(){
@@ -289,7 +328,7 @@ $(document).ready(function(){
                 mp3: "./media/shoot.mp3"
             })
         },
-	volume: 0.3,
+	volume: 0.1,
 	swfPath: "./libs/",
 	supplied: "mp3"
     });
@@ -300,14 +339,21 @@ $(document).ready(function(){
                 mp3: "./media/explosion.mp3"
             })
         },
-	volume:0.3,
+	volume:0.1,
 	swfPath: "./libs/",
 	supplied: "mp3"
     });
 
-
-
-
+    $("#invaderkilled").jPlayer({
+	ready: function () {
+            $(this).jPlayer("setMedia", {
+                mp3: "./media/invaderkilled.mp3"
+            })
+        },
+	volume:0.1,
+	swfPath: "./libs/",
+	supplied: "mp3"
+    });
 
 
 
@@ -337,9 +383,12 @@ $(document).ready(function(){
 	    x2=worldWidth-width/2;
 	}
 	
-	player.css('left',x2-(width/2));
+	if(!pausedGame && !gameOver && !levelCleared){
+	    player.css('left',x2-(width/2));
+	}
     
     });
+    
     
 
     //Bullet management
@@ -373,27 +422,29 @@ $(document).ready(function(){
     
     initWorld(true);
     
+    $(".settings").focus(function(){
+	if(!pausedGame){
+	    pausedGame =true;
+	    stopGame();
+	}
+    });
     
-    $("#ticksPerMovement").change(function(){ 
-	pausedGame =true;
-	stopGame();
-	unpauseGame();
-	pausedGame =false;
-	ticksPerMovement = $(this).val();
+    $("#applySettings").click(function(){ 
+	
+	enemyMovesPerSecond = Number($("#enemyMovesPerSecond").val());
+   	fps = Number($("#ticksPerSecond").val());	
+	verticalAdvance = Number($("#verticalSpeed").val());
+	horizontalAdvance = Number($("#horizontalSpeed").val());	
+	maxBullets = Number($("#maxBullets").val());
+	firingProbability = Number($("#firingProbability").val());
+	
+	if(pausedGame){
+	    unpauseGame();
+	    pausedGame =false;
+	}
     });
-    $("#ticksPerSecond").change(function(){ 
-	pausedGame =true;
-	stopGame();
-	unpauseGame();
-	pausedGame =false;
-	fps = $(this).val();
-    });
-    $("#verticalSpeed").change(function(){ 
-	verticalAdvance = $(this).val();
-    });
-    $("#horizontalSpeed").change(function(){ 
-	horizontalAdvance = $(this).val();
-    });
+        
+
 
     $("#reset").click(function(){ 
 	if(confirm("Are you sure you want to reset? All progress will be lost")){
@@ -404,15 +455,10 @@ $(document).ready(function(){
 
     // This is how we move to the next level
     $("#nextLevelLink").click(function(){
-	//0 increase firing rate
-	//1 increase horizontal speed
-	//2 increase vertical speed
-	//3 decrease ticks per movement
 	firingProbability = firingProbability*2; 
 	$("#firingProbability").val(firingProbability);
-
-	ticksPerMovement -= 2;
-	$("#ticksPerMovement").val(ticksPerMovement);
+	enemyMovesPerSecond = enemyMovesPerSecond + 0.2;
+	$("#enemyMovesPerSecond").val(enemyMovesPerSecond);
 	$("#levelCleared").hide();
 	initWorld(false);
 	
@@ -424,12 +470,19 @@ $(document).ready(function(){
 
 function initWorld(reset){
     $(".row,.enemyBullet,.playerBullet").remove();
+    $("#playerIcon").removeClass("playerdead");
+    $("#soundtrack").jPlayer("volume",1);
     $("#gameOver").hide();
     $("#pause").hide();
     
     if(loop){
 	clearInterval(loop);
 	loop = null;
+    }
+    
+    if(enemyLoop){
+	clearInterval(enemyLoop);
+	enemyLoop = null;
     }
     
     playerBullets = new Array();
@@ -445,23 +498,31 @@ function initWorld(reset){
 	/* Game status */
 	maxLeft = 0;
 	/* */
-	ticksPerMovement = 40;
-	fps = 30;
+	enemyMovesPerSecond = 3;
+	
+	fps = 60;
     
 	/* Enemy movements  */
 	verticalAdvance = 20;
 	horizontalAdvance = 30;
 	
 	/* Enemy stats */
-	firingProbability = 0.01;
+	firingProbability = 0.005;
+	maxBullets = 1;
+
+	$("#enemyMovesPerSecond").val(enemyMovesPerSecond);
+	$("#ticksPerSecond").val(fps);
+	$("#verticalSpeed").val(verticalAdvance);
+	$("#horizontalSpeed").val(horizontalAdvance);
+	$("#maxBullets").val(maxBullets);
+	$("#firingProbability").val(firingProbability);
+    
     }
 
     for(var i =0; i<5; i++){
 	addRow();
     }
-    loop = setInterval(function(){
-	refreshWorld();
-    },1000/fps);
-
+    loop = setInterval(function(){refreshWorld();},1000/fps);
+    enemyLoop = setInterval(function(){moveEnemies();},1000/enemyMovesPerSecond);
 }
 

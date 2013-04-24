@@ -1,12 +1,20 @@
 #playerIcon{
     position:absolute;
-    bottom:5px;
-    height:20px;
+    bottom:0px;
+    height:37px;
     width:60px;;
-    background-color:green;
+    background-color:black;
+    background-image:url('./assets/player.png');
     z-index:10;
 }
 
+#playerIcon.shoot{
+    background-image:url('./assets/shoot.gif');
+}
+
+#playerIcon.playerdead{
+    background-image:url('./assets/explosion.gif');
+}
 #gameOver, #pause, #levelCleared{
     display:none;
     background-image:url('./assets/gameover.jpg');
@@ -88,6 +96,14 @@ color:white;
 .dead{
     visibility:hidden;
 }
+
+.explode{
+    background: url('./assets/invaderkill.png') !important;
+}
+.explode.dead{
+    visibility:visible;
+}
+
 .enemy{
     background-color:red;
     /*width:10%;*/
