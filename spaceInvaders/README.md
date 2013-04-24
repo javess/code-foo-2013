@@ -5,6 +5,8 @@ This implementation of space invaders was done 100% using javascript (with a lit
 
 It has been tested on Chrome and Safari and it runs B-E-A-utifully. 
 
+IE probably does its usual IE think and crashes badly with this. I didn't have the change to test it out
+
 I hope everyone enjoys this
 
 
