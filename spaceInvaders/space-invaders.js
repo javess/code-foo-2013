@@ -7,7 +7,7 @@ var totalEnemyBullets = 0;
 
 var loop;
 var enemyLoop;
-var UFOLoop;
+var UFOloop;
 
 var score = 0;
 
