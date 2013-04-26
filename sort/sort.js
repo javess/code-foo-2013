@@ -20,6 +20,20 @@ However it seemed hardly worth it for this specific case
 ***/
 
 
+//Check if array is sorted for testing purposes
+
+function isSorted(a){
+    if(a.length <= 1){
+	return true;
+    }else{
+	var isSorted = true;
+	for(var i = 1; i < a.length; i++){
+	    if(a[i-1].score > a[i].score)
+		return false;
+	}
+	return true;
+    }
+}
 
 
 //Just a nice function wrapper to avoid adding the extra indexes on the user side

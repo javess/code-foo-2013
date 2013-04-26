@@ -20,11 +20,12 @@ for(var j = 1; j < 7; j++){
     }
     var endArray = new Date();
     document.write('Array created in ' +(endArray - initArray)+'ms<br/>');
+    document.write('Array initially sorted  = ' + isSorted(a) + '<br/>');
     var init = new Date();
     sort(a);
     var end = new Date();
-    document.write('Array of size: ' +items + ' ordered in ' + (end-init) + 'ms<hr/>');
-
+    document.write('Array of size: ' +items + ' ordered in ' + (end-init) + 'ms<br/>');
+    document.write('Array sorted  = ' + isSorted(a) + ' <hr/>');
 }
 
 
